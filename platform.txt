@@ -111,6 +111,10 @@ recipe.objcopy.hex.pattern="{compiler.path}{compiler.objcopy.cmd}" {compiler.elf
 
 build.preferred_out_format=bin
 
+## convert file to telechips VCP preferred_out_format
+recipe.hooks.objcopy.postobjcopy.1.pattern.windows="{runtime.tools.vcp-tools.path}/tcmk-convert.exe" "{build.path}/{build.project_name}.bin" "{build.path}/{build.project_name}.rom"
+recipe.hooks.objcopy.postobjcopy.1.pattern.linux="python3" "{runtime.tools.vcp-tools.path}/main.py" "{build.path}/{build.project_name}.bin" "{build.path}/{build.project_name}.rom"
+
 ## Save binary
 recipe.output.tmp_file={build.project_name}.{build.preferred_out_format}
 recipe.output.save_file={build.project_name}.{build.board}.{build.preferred_out_format}
@@ -121,21 +125,3 @@ recipe.size.regex=^(?:\.text|\.data|\.rodata)\s+([0-9]+).*
 recipe.size.regex.data=^(?:\.data|\.bss|\.noinit)\s+([0-9]+).*
 recipe.size.regex.eeprom=^(?:\.eeprom)\s+([0-9]+).*
 
-# Upload using Maple bootloader over DFU
-tools.maple_upload.cmd=maple_upload.sh
-tools.maple_upload.cmd.windows=maple_upload.bat
-tools.maple_upload.path={runtime.tools.STM32Tools.path}/win
-tools.maple_upload.path.macosx={runtime.tools.STM32Tools.path}/macosx
-tools.maple_upload.path.linux={runtime.tools.STM32Tools.path}/linux
-tools.maple_upload.upload.params.verbose=-d
-tools.maple_upload.upload.params.quiet=n
-tools.maple_upload.upload.pattern="{path}/{cmd}" {serial.port.file} {upload.altID} {upload.usbID} "{build.path}/{build.project_name}.bin"
-
-# STM32MP1 self-contained shell script
-tools.remoteproc_gen.path={runtime.tools.STM32Tools.path}
-tools.remoteproc_gen.busybox=
-tools.remoteproc_gen.busybox.windows={path}/win/busybox.exe
-tools.remoteproc_gen.script=run_arduino_gen.sh
-tools.remoteproc_gen.upload.params.verbose=
-tools.remoteproc_gen.upload.params.quiet=
-tools.remoteproc_gen.upload.pattern="{busybox}" sh "{path}/{script}" generate "{build.path}/{build.project_name}.elf" "{build.path}/run_arduino_{build.project_name}.sh"
